@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bg" cx="70%" cy="25%" r="85%"><stop offset="0" stop-color="#2a1468"/><stop offset=".55" stop-color="#1a0944"/><stop offset="1" stop-color="#0d0423"/></radialGradient>
+    <linearGradient id="g1" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#1f8f5c"/><stop offset="1" stop-color="#4fd394"/></linearGradient>
+    <linearGradient id="g2" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#17744b"/><stop offset="1" stop-color="#34b27b"/></linearGradient>
+    <clipPath id="front"><rect x="0" y="256" width="512" height="256"/></clipPath>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <g transform="translate(6 -4)">
+  <!-- orbita: metà dietro -->
+  <ellipse cx="256" cy="262" rx="176" ry="62" fill="none" stroke="#17b3e8" stroke-opacity=".45" stroke-width="10" transform="rotate(-22 256 262)"/>
+  <!-- erba -->
+  <path d="M206 352 C204 300 218 252 248 212 C258 258 254 308 240 352 Z" fill="url(#g1)"/>
+  <path d="M248 352 C254 306 274 270 306 244 C302 282 290 322 278 352 Z" fill="url(#g2)"/>
+  <path d="M176 352 C170 324 158 302 136 286 C152 312 160 332 162 352 Z" fill="url(#g2)"/>
+
+  <!-- orbita: metà davanti -->
+  <g clip-path="url(#front)" transform="rotate(-22 256 262)"><ellipse cx="256" cy="262" rx="176" ry="62" fill="none" stroke="#17b3e8" stroke-width="10"/></g>
+  <!-- satellite -->
+  <g transform="rotate(-22 256 262)">
+    <circle cx="420" cy="238" r="34" fill="#17b3e8" fill-opacity=".18"/>
+    <circle cx="420" cy="238" r="17" fill="#17b3e8"/>
+    <circle cx="420" cy="238" r="7" fill="#e9f8ff"/>
+  </g>
+  </g>
+</svg>
