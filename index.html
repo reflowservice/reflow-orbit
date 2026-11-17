@@ -32,7 +32,7 @@ button,input,select{font:inherit;color:inherit}
 a{color:inherit}
 
 /* ============ barra superiore ============ */
-header{position:relative;z-index:20;display:flex;align-items:center;gap:16px;height:60px;padding:0 22px;color:#fff;background:rgba(13,4,35,.92);backdrop-filter:blur(10px);border-bottom:1px solid rgba(23,179,232,.22)}
+header{position:relative;z-index:20;display:flex;align-items:center;gap:16px;height:calc(60px + env(safe-area-inset-top));padding:env(safe-area-inset-top) 22px 0;color:#fff;background:rgba(13,4,35,.92);backdrop-filter:blur(10px);border-bottom:1px solid rgba(23,179,232,.22)}
 .brandlink{border:0;padding:0;background:none;cursor:pointer;display:block}
 .brand{height:24px;width:auto;display:block}
 .hsep{width:1px;height:26px;background:rgba(255,255,255,.14)}
@@ -44,7 +44,7 @@ header{position:relative;z-index:20;display:flex;align-items:center;gap:16px;hei
 .hbtn:hover{background:rgba(255,255,255,.1)}
 
 /* ============ schermata iniziale ============ */
-#splash{position:fixed;inset:0;z-index:50;display:grid;grid-template-rows:auto 1fr auto;padding:30px 44px;color:#fff;overflow:hidden;
+#splash{position:fixed;inset:0;z-index:50;display:grid;grid-template-rows:auto 1fr auto;grid-template-columns:minmax(0,1fr);padding:max(30px,env(safe-area-inset-top)) 44px max(30px,env(safe-area-inset-bottom));color:#fff;overflow:hidden;
   background:radial-gradient(900px 600px at 72% 55%,rgba(45,91,227,.28),transparent 65%),radial-gradient(600px 420px at 6% 110%,rgba(23,179,232,.14),transparent 70%),linear-gradient(160deg,#1b0a45,#0b0320 75%)}
 .sp-logo{height:30px;width:auto;position:relative;z-index:2}
 .sp-art{position:absolute;inset:0;pointer-events:none}
@@ -226,7 +226,7 @@ header{position:relative;z-index:20;display:flex;align-items:center;gap:16px;hei
   .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (max-width:640px){
-  header{padding:0 14px;gap:10px;height:54px}
+  header{padding:env(safe-area-inset-top) 14px 0;gap:10px;height:calc(54px + env(safe-area-inset-top))}
   .brand{height:21px}
   .sp-foot{flex-direction:column;gap:4px}
   .sp-in p{margin:18px 0 34px}
@@ -267,7 +267,9 @@ header{position:relative;z-index:20;display:flex;align-items:center;gap:16px;hei
   .appname,.hstamp,.hsep{display:none}
   .hbtn{margin-left:auto}
   .row2>.panel:last-child{order:-1}
-  #splash{padding:22px}
+  #splash{padding:max(22px,env(safe-area-inset-top)) 22px max(22px,env(safe-area-inset-bottom))}
+  .sp-title{font-size:min(7.6vw,34px);letter-spacing:.07em}
+  .sp-foot{font-size:11.5px}
   .sp-art svg{right:-40vw;opacity:.5!important}
   .tleg{grid-template-columns:repeat(2,minmax(0,1fr))}
   .tools-in{padding:10px 16px}
