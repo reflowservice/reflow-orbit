@@ -233,13 +233,13 @@ function riga(i){
 function filtra(){
   return D.impianti.filter(i=>{
     if(F.sem&&gruppo(sem(i))!==F.sem)return false;
-    if(F.pm&&i.pm!==F.pm&&i.pm2!==F.pm)return false;
+    if(F.pm&&i.pm!==F.pm)return false;
     if(F.q){const q=F.q.toLowerCase();if(!(`${i.nome} ${i.cliente} ${i.regione}`.toLowerCase().includes(q)))return false;}
     return true;});
 }
 
 function contatori(){
-  const base=D.impianti.filter(i=>!F.pm||i.pm===F.pm||i.pm2===F.pm);
+  const base=D.impianti.filter(i=>!F.pm||i.pm===F.pm);
   $('k-tot').textContent=base.length;
   for(const g of ['rosso','giallo','verde','altro'])$('k-'+g).textContent=base.filter(i=>gruppo(sem(i))===g).length;
   document.querySelectorAll('.kpi').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.f===F.sem)));
@@ -357,7 +357,7 @@ ORBIT.ready.then(async ok=>{
   $('sp-count').textContent='Caricamento…';
   D=await ORBIT.getJSON('dati/orbit.json');
   if(!D){$('sp-count').textContent='Dati non ancora disponibili su SharePoint.';D=null;return;}
-  const pm=[...new Set(D.impianti.flatMap(i=>[i.pm,i.pm2]).filter(Boolean))].sort();
+  const pm=[...new Set(D.impianti.map(i=>i.pm).filter(Boolean))].sort();
   $('fpm').innerHTML='<option value="">Tutti i PM</option>'+pm.map(p=>`<option>${esc(p)}</option>`).join('');
   try{const p=localStorage.getItem('orbit-pm');if(p&&pm.includes(p)){F.pm=p;$('fpm').value=p;}}catch(_){}
   const agg=new Date(D.aggiornato);
