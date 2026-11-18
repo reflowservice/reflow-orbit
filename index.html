@@ -165,6 +165,8 @@ header{position:relative;z-index:20;display:flex;align-items:center;gap:16px;hei
 .gauge{height:4px;border-radius:99px;background:var(--mist-2);overflow:hidden;margin-top:12px}
 .gauge i{display:block;height:100%;border-radius:99px;background:var(--c)}
 .gnote{display:flex;justify-content:space-between;margin-top:5px;font-size:11.5px;color:var(--muted)}
+.tag{display:inline-flex;align-items:center;height:20px;padding:0 8px;margin-left:6px;border-radius:999px;background:#efeaff;color:#4b3a8f;font-size:11px;font-weight:600;vertical-align:1px;white-space:nowrap}
+.sh-top .tag{background:rgba(255,255,255,.12);color:#e9e4ff;margin-left:8px}
 .empty{padding:60px 20px;text-align:center;color:var(--muted)}
 .empty b{display:block;color:var(--navy);font-size:16px;margin-bottom:4px}
 
@@ -450,7 +452,7 @@ function card(i){
       ${i.immagine_bbox?`<svg viewBox="0 0 512 512" preserveAspectRatio="xMidYMid slice">${contorno(i.geometria,i.immagine_bbox,512,512,2.4)}</svg>`:''}
       <span class="chip${e.off?' off':''}" style="--c:${s.c}"><i></i>${esc(s.t)}${e.off?' <small>al 31 ott</small>':''}</span>
       ${haDi(i)?`<span class="ha">${num(haDi(i),1)} ha</span>`:''}</div>
-    <div class="cb"><div class="cn">${esc(i.nome)}</div><div class="cm">${esc(titolo(i.regione))}${i.pm?', PM '+esc(titolo(i.pm)):''}</div>
+    <div class="cb"><div class="cn">${esc(i.nome)}</div><div class="cm">${esc(titolo(i.regione))}${i.pm?', PM '+esc(titolo(i.pm)):''}${i.sfalcio==='su richiesta'?'<span class="tag" title="Sfalcio non a contratto: si fa su richiesta del cliente">Su richiesta</span>':''}</div>
       ${e.k==='nd'?'':`<div class="cf"><div class="metric"><b>${num(i.stato?.ndvi)}</b><span>indice di verde</span></div>${spark(i.serie,e)}</div>`}
       ${gnote}</div></button>`;
 }
@@ -531,7 +533,7 @@ async function scheda(id){
   const gm=i.centro?`https://www.google.com/maps/@${i.centro[0]},${i.centro[1]},600m/data=!3m1!1e3`:null;
   const ico='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h4v4M13 3L7.5 8.5M12 9.5V13H3V4h3.5"/></svg>';
   const days=st.giorni_alla_soglia;
-  $('sheet').innerHTML=`<div class="sh-top"><div><h2 id="sh-name">${esc(i.nome)}</h2><div class="sub">${esc(titolo(i.cliente))}, ${esc(titolo(i.regione))}. PM ${esc(titolo(i.pm||'–'))}${i.pm2?', seconda linea '+esc(titolo(i.pm2)):''}</div></div><button class="x" id="b-x" aria-label="Chiudi">×</button></div>
+  $('sheet').innerHTML=`<div class="sh-top"><div><h2 id="sh-name">${esc(i.nome)}</h2><div class="sub">${esc(titolo(i.cliente))}, ${esc(titolo(i.regione))}. PM ${esc(titolo(i.pm||'–'))}${i.pm2?', seconda linea '+esc(titolo(i.pm2)):''}${i.sfalcio==='su richiesta'?'<span class="tag">Sfalcio su richiesta</span>':''}</div></div><button class="x" id="b-x" aria-label="Chiudi">×</button></div>
   <div class="sh-body">
     <div class="row2">
       <div class="panel">
