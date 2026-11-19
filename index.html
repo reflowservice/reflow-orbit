@@ -405,7 +405,7 @@ let D=null, F={sem:'',pm:'',q:'',vista:'cliente'};
 /* stato da mostrare: fuori stagione si usa la situazione all'ultimo giorno di stagione */
 function eff(i){
   const st=i.stato||{};
-  if(st.semaforo==='spento'&&st.fine_stagione){const f=st.fine_stagione;return {k:f.semaforo,off:true,st:Object.assign({},st,{riferimento:f.riferimento,soglia_gialla:f.soglia_gialla,minimo_60gg:f.minimo_60gg,livello_pct:f.livello_pct}),al:f.al_giorno,motivo:f.motivo};}
+  if(st.semaforo==='spento'&&st.fine_stagione){const f=st.fine_stagione;return {k:f.semaforo,off:true,st:Object.assign({},st,{riferimento:f.riferimento,soglia_gialla:f.soglia_gialla,minimo_60gg:f.minimo_60gg,livello_pct:f.livello_pct,ndvi_stagione:f.ndvi}),al:f.al_giorno,motivo:f.motivo};}
   return {k:st.semaforo||'nd',off:false,st,motivo:st.motivo};
 }
 const gruppo=k=>['rosso','giallo','verde'].includes(k)?k:'altro';
@@ -485,7 +485,7 @@ function card(i){
       <span class="chip${e.off?' off':''}" style="--c:${s.c}"><i></i>${esc(s.t)}${e.off?' <small>al 31 ott</small>':''}</span>
       ${haDi(i)?`<span class="ha">${num(haDi(i),1)} ha</span>`:''}</div>
     <div class="cb"><div class="cn">${esc(i.nome)}</div><div class="cm">${esc(titolo(i.regione))}${i.pm?', PM '+esc(titolo(i.pm)):''}${i.sfalcio==='su richiesta'?'<span class="tag" title="Sfalcio non a contratto: si fa su richiesta del cliente">Su richiesta</span>':''}</div>
-      ${e.k==='nd'?'':`<div class="cf"><div class="metric"><b>${num(i.stato?.ndvi)}</b><span>indice di verde</span></div>${spark(i.serie,e)}</div>`}
+      ${e.k==='nd'?'':`<div class="cf"><div class="metric"><b>${num(e.off&&e.st.ndvi_stagione!=null?e.st.ndvi_stagione:i.stato?.ndvi)}</b><span>${e.off?'verde al 31 ott':'indice di verde'}</span></div>${spark(i.serie,e)}</div>`}
       ${gnote}</div></button>`;
 }
 const titolo=s=>String(s||'').toLowerCase().replace(/(^|[\s'-])\S/g,m=>m.toUpperCase());
@@ -583,8 +583,8 @@ async function scheda(id){
         ${e.off?`<div class="offnote">Avvisi in pausa fino a marzo. Questa è la situazione al ${dIT(e.al,{day:'numeric',month:'long'})}, ultimo giorno di stagione; l'ultima immagine utile è del ${dIT(st.data_immagine)}.</div>`:''}
         ${binario(e)}
         <div class="stats">
-          <div class="st"><span>Indice di verde</span><b>${num(st.ndvi)}</b></div>
-          <div class="st"><span>Ultima immagine utile</span><b>${dIT(st.data_immagine,{day:'numeric',month:'short'})}</b></div>
+          <div class="st"><span>${e.off?'Indice di verde al 31 ott':'Indice di verde'}</span><b>${num(e.off&&e.st.ndvi_stagione!=null?e.st.ndvi_stagione:st.ndvi)}</b></div>
+          <div class="st"><span>Ultima immagine utile</span><b>${dIT(st.data_immagine,{day:'numeric',month:'short'})}${e.off?' <small>· verde '+num(st.ndvi)+'</small>':''}</b></div>
           <div class="st"><span>Ricrescita</span><b>${e.st.livello_pct!=null?Math.min(150,e.st.livello_pct)+'<small>%</small>':'–'}</b></div>
           <div class="st"><span>Soglia di avviso</span><b>${e.off?'–':(st.soglia_gialla!=null&&st.ndvi>=st.soglia_gialla)?'Superata':days!=null?'tra ~'+days+' <small>gg</small>':'–'}</b></div>
         </div>
