@@ -8,6 +8,7 @@
 <link rel="icon" href="assets/favicon-64.png">
 <link rel="apple-touch-icon" href="assets/icon-192.png">
 <meta name="theme-color" content="#120531">
+<script>try{if(sessionStorage.getItem('orbit_refresh')==='1')document.documentElement.classList.add('refreshing')}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Syncopate:wght@400;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -44,7 +45,7 @@ header{position:relative;z-index:20;display:flex;align-items:center;gap:16px;hei
 .hbtn:hover{background:rgba(255,255,255,.1)}
 
 /* ============ schermata iniziale ============ */
-#splash{position:fixed;inset:0;z-index:50;display:grid;grid-template-rows:auto 1fr auto;grid-template-columns:minmax(0,1fr);padding:max(30px,env(safe-area-inset-top)) 44px max(30px,env(safe-area-inset-bottom));color:#fff;overflow:hidden;background:#0d0423}
+#splash,#gate{position:fixed;inset:0;z-index:50;display:grid;grid-template-rows:auto 1fr auto;grid-template-columns:minmax(0,1fr);padding:max(30px,env(safe-area-inset-top)) 44px max(30px,env(safe-area-inset-bottom));color:#fff;overflow:hidden;background:#0d0423}
 .sp-logo{height:30px;width:auto;position:relative;z-index:2}
 .sp-img{position:absolute;inset:-2%;background:#0d0423 url(assets/intro.jpg) 58% 50%/cover no-repeat;transform:scale(1.08);animation:kb 22s cubic-bezier(.2,.6,.2,1) forwards;filter:saturate(.92) contrast(1.04)}
 @keyframes kb{to{transform:scale(1)}}
@@ -73,6 +74,18 @@ header{position:relative;z-index:20;display:flex;align-items:center;gap:16px;hei
 .sp-go:hover{transform:translateY(-2px);box-shadow:0 18px 46px rgba(0,0,0,.5)}
 .sp-go svg{width:18px;height:18px}
 .sp-foot{position:relative;z-index:2;display:flex;justify-content:space-between;gap:16px;font-size:12px;color:rgba(232,229,247,.5)}
+
+/* ============ schermata di aggiornamento (dopo "Aggiorna") ============ */
+/* Il battito deve coincidere con BEAT_MS nello script: la schermata resta per 3 battiti (minimo 3 s) e si chiude da sola. */
+#gate{display:none;z-index:70;--beat:1s;transition:opacity .5s,visibility .5s}
+.refreshing #gate{display:grid}
+.refreshing #splash{display:none}
+#gate.out{opacity:0;visibility:hidden}
+.gate-msg{margin:22px 0 0;min-height:1.5em;font:300 clamp(16px,1.5vw,20px)/1.4 var(--disp);letter-spacing:.02em;color:#d9d3f3}
+.gate-msg.err{color:#ffb4b4}
+.gate-pulse{display:block;width:min(100%,460px);height:72px;margin-top:26px;opacity:.9;overflow:visible}
+.gate-pulse path{fill:none;vector-effect:non-scaling-stroke;stroke:var(--cyan);stroke-width:2;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:900;stroke-dashoffset:900;filter:drop-shadow(0 0 6px rgba(23,179,232,.7));animation:gatePulse var(--beat,1s) ease-in-out infinite}
+@keyframes gatePulse{0%{stroke-dashoffset:900;opacity:0}15%{opacity:1}60%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:0;opacity:0}}
 
 /* ============ vista dall'orbita (testata della pagina) ============ */
 #home{flex:1;overflow:auto;background:var(--mist);scroll-behavior:smooth}
@@ -281,7 +294,9 @@ header{position:relative;z-index:20;display:flex;align-items:center;gap:16px;hei
   .appname,.hstamp,.hsep{display:none}
   .hbtn{margin-left:auto}
   .row2>.panel:last-child{order:-1}
-  #splash{padding:max(22px,env(safe-area-inset-top)) 22px max(22px,env(safe-area-inset-bottom))}
+  #splash,#gate{padding:max(22px,env(safe-area-inset-top)) 22px max(22px,env(safe-area-inset-bottom))}
+  #b-reload:not([hidden])+#b-out{margin-left:0}
+  .gate-pulse{height:56px}
   .sp-title{font-size:min(7.6vw,34px);letter-spacing:.07em}
   .sp-foot{font-size:11.5px}
   .sp-img{background-image:url(assets/intro-m.jpg);background-position:62% 50%}
@@ -297,7 +312,7 @@ header{position:relative;z-index:20;display:flex;align-items:center;gap:16px;hei
   .panel{padding:16px}
   .cut{grid-template-columns:1fr;gap:2px}
 }
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.sp-frame i,.sp-frame b,.sp-hud{opacity:1}.sp-img{transform:none}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.sp-frame i,.sp-frame b,.sp-hud{opacity:1}.sp-img{transform:none}.gate-pulse path{stroke-dashoffset:0}}
 </style>
 </head>
 <body>
@@ -307,6 +322,7 @@ header{position:relative;z-index:20;display:flex;align-items:center;gap:16px;hei
   <svg class="mark" viewBox="100 100 312 312" aria-hidden="true"> <defs> <linearGradient id="ompv" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5fd3ff"/><stop offset="1" stop-color="#1196c9"/></linearGradient> <linearGradient id="ombody" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d9d4f0"/></linearGradient> </defs> <g transform="rotate(-38 256 236)"> <rect x="96" y="206" width="104" height="52" rx="7" fill="url(#ompv)"/> <path d="M130.7 206 V258 M165.3 206 V258 M96 232 H200" stroke="#18063c" stroke-width="5"/> <rect x="312" y="206" width="104" height="52" rx="7" fill="url(#ompv)"/> <path d="M346.7 206 V258 M381.3 206 V258 M312 232 H416" stroke="#18063c" stroke-width="5"/> <rect x="200" y="225" width="112" height="14" rx="3" fill="#b9afe8"/> <rect x="228" y="186" width="56" height="96" rx="16" fill="url(#ombody)"/> <rect x="240" y="200" width="32" height="10" rx="5" fill="#18063c" fill-opacity=".18"/> <path d="M256 282 v16" stroke="#e9e6f7" stroke-width="8" stroke-linecap="round"/> <path d="M234 314 a22 22 0 0 0 44 0" fill="none" stroke="#4fd394" stroke-width="10" stroke-linecap="round"/> <path d="M216 334 a40 40 0 0 0 80 0" fill="none" stroke="#34b27b" stroke-width="10" stroke-linecap="round" stroke-opacity=".75"/> <path d="M198 354 a58 58 0 0 0 116 0" fill="none" stroke="#34b27b" stroke-width="10" stroke-linecap="round" stroke-opacity=".4"/> </g> </svg>  
   <span class="appname">REFLOW <b>ORBIT</b></span>
   <span class="hstamp" id="hstamp"></span>
+  <button class="hbtn" id="b-reload" title="Rilegge i dati da SharePoint">Aggiorna</button>
   <button class="hbtn" id="b-out" title="Esci dall'account Microsoft">Esci</button>
 </header>
 
@@ -321,6 +337,19 @@ header{position:relative;z-index:20;display:flex;align-items:center;gap:16px;hei
     <button class="sp-go" id="b-enter">Impianti<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></button>
   </div>
   <div class="sp-foot"><span>Reflow S.r.l., gruppo ESPE. Contiene dati Copernicus Sentinel-2 modificati (2024)</span><span id="sp-count"></span></div>
+</section>
+
+<section id="gate" aria-live="polite">
+  <img class="sp-logo" alt="Reflow Maintenance Service" src="assets/logo_w.png">
+  <div class="sp-img" aria-hidden="true"></div><div class="sp-shade" aria-hidden="true"></div>
+  <div class="sp-frame" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b><span class="sp-scan"></span>
+    <span class="sp-hud t">Sentinel-2 <em>L2A</em> · 10 m</span><span class="sp-hud b">44,94° N 11,40° E · estate 2024</span></div>
+  <div class="sp-in">
+    <h2 class="sp-title" aria-label="REFLOW ORBIT">REFLOW <span>ORBIT</span></h2>
+    <div class="gate-msg" id="gate-msg">Aggiornamento dei dati…</div>
+    <svg class="gate-pulse" viewBox="0 0 600 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 70 H190 L215 70 L235 22 L262 104 L288 46 L306 70 H600"/></svg>
+  </div>
+  <div class="sp-foot"><span>Reflow S.r.l., gruppo ESPE. Contiene dati Copernicus Sentinel-2 modificati (2024)</span></div>
 </section>
 
 <main id="home" hidden>
@@ -583,18 +612,39 @@ $('modal').onclick=e=>{if(e.target.id==='modal')location.hash='impianti';};
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('modal').hidden)location.hash='impianti';});
 $('b-start').onclick=()=>{location.hash='';};
 $('b-out').onclick=()=>ORBIT.logout();
+$('b-reload').onclick=()=>{try{sessionStorage.setItem('orbit_refresh','1');}catch(_){}location.reload();};
 $('fpm').onchange=e=>{F.pm=e.target.value;try{localStorage.setItem('orbit-pm',F.pm);}catch(_){}tutto();};
 $('hq').oninput=e=>{F.q=e.target.value.trim();tutto();};
 $('af-x').onclick=()=>{F.sem='';tutto();};
 document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{F.vista=b.dataset.v;document.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));elenco();});
 window.addEventListener('hashchange',route);
 
+// Dopo "Aggiorna" la pagina si ricarica: la schermata col battito resta per 3 battiti (minimo 3 s) e si chiude da sola.
+// BEAT_MS deve coincidere con --beat di #gate nel CSS.
+const BEAT_MS=1000;
+let REFRESH=false;
+try{REFRESH=sessionStorage.getItem('orbit_refresh')==='1';sessionStorage.removeItem('orbit_refresh');}catch(_){}
+if(REFRESH&&location.hash==='')history.replaceState(null,'','#impianti');
+function chiudiGate(subito){
+  const g=$('gate'),fine=()=>{document.documentElement.classList.remove('refreshing');g.classList.remove('out');};
+  if(!REFRESH)return;REFRESH=false;
+  g.classList.add('out');setTimeout(fine,subito?0:500);
+}
+function gateAl3Battito(){
+  // chiude alla fine del terzo battito dall'apertura della pagina (o al primo battito successivo, se i dati arrivano dopo)
+  const p=document.querySelector('.gate-pulse path');
+  const an=p&&p.getAnimations?p.getAnimations()[0]:null;
+  const t=an&&an.currentTime!=null?an.currentTime:performance.now();
+  const fine=Math.ceil(Math.max(t,3*BEAT_MS-1)/BEAT_MS)*BEAT_MS;
+  setTimeout(()=>chiudiGate(),fine-t);
+}
+
 ORBIT.ready.then(async ok=>{
   const b=$('b-enter');
-  if(!ok){b.firstChild.textContent='Accedi';b.onclick=()=>ORBIT.login();$('b-out').hidden=true;return;}
+  if(!ok){b.firstChild.textContent='Accedi';b.onclick=()=>ORBIT.login();$('b-out').hidden=true;$('b-reload').hidden=true;chiudiGate(true);return;}
   $('sp-count').textContent='Caricamento dei dati…';
   D=await ORBIT.getJSON('dati/orbit.json');
-  if(!D){$('sp-count').textContent='Dati non ancora pubblicati su SharePoint.';return;}
+  if(!D){$('sp-count').textContent='Dati non ancora pubblicati su SharePoint.';chiudiGate(true);return;}
   const pm=[...new Set(D.impianti.map(i=>i.pm).filter(Boolean))].sort();
   $('fpm').innerHTML='<option value="">Tutti i PM</option>'+pm.map(p=>`<option value="${esc(p)}">${esc(titolo(p))}</option>`).join('');
   try{const p=localStorage.getItem('orbit-pm');if(p&&pm.includes(p)){F.pm=p;$('fpm').value=p;}}catch(_){}
@@ -606,7 +656,8 @@ ORBIT.ready.then(async ok=>{
   tutto();
   if(location.hash==='')$('splash').hidden=false;
   route();
-}).catch(e=>{console.error(e);$('sp-count').textContent='Errore: '+(e&&e.message||e);});
+  if(REFRESH){$('gate-msg').textContent='Dati del '+agg.toLocaleDateString('it-IT')+' alle '+agg.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});gateAl3Battito();}
+}).catch(e=>{console.error(e);$('sp-count').textContent='Errore: '+(e&&e.message||e);chiudiGate(true);});
 route();
 </script>
 </body>
