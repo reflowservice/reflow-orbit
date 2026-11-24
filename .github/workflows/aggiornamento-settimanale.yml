@@ -1,0 +1,81 @@
+# REFLOW ORBIT - aggiornamento settimanale dei dati satellitari.
+# Ogni lunedi' mattina ricalcola lo stato di tutti gli impianti da Sentinel-2
+# e pubblica i risultati, cifrati, nel ramo `dati` (letto dall'app).
+# Nessun dato in chiaro: il repository e i suoi log sono pubblici.
+# Secrets necessari: ORBIT_CHIAVE, COPERNICUS_CLIENT_ID, COPERNICUS_CLIENT_SECRET.
+name: ORBIT - aggiornamento settimanale
+
+on:
+  schedule:
+    - cron: '23 4 * * 1'   # lunedi' 05:23 ora italiana d'inverno (06:23 d'estate)
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'motore/**'
+      - '.github/workflows/aggiornamento-settimanale.yml'
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: orbit-dati
+  cancel-in-progress: false
+
+jobs:
+  giro:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      TZ: Europe/Rome
+    steps:
+      - name: Codice
+        uses: actions/checkout@v4
+        with:
+          path: app
+
+      - name: Ramo dati
+        uses: actions/checkout@v4
+        with:
+          ref: dati
+          path: dati
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Dipendenze
+        run: pip install --quiet requests cryptography
+
+      - name: Calcolo
+        id: calcolo
+        continue-on-error: true
+        env:
+          ORBIT_CHIAVE: ${{ secrets.ORBIT_CHIAVE }}
+          COPERNICUS_CLIENT_ID: ${{ secrets.COPERNICUS_CLIENT_ID }}
+          COPERNICUS_CLIENT_SECRET: ${{ secrets.COPERNICUS_CLIENT_SECRET }}
+        run: python app/motore/orbit_settimanale.py giro --dati dati
+
+      - name: Pubblicazione nel ramo dati
+        if: always()
+        working-directory: dati
+        run: |
+          git config user.name "REFLOW ORBIT (aggiornamento automatico)"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan nuovo
+          git add -A
+          git commit --quiet -m "Dati ORBIT del $(date +%F) (esito: ${{ steps.calcolo.outcome }})"
+          git push --quiet --force origin nuovo:dati
+
+      - name: Mantieni attiva la pianificazione
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/aggiornamento-settimanale.yml/enable" || true
+
+      - name: Esito
+        if: steps.calcolo.outcome != 'success'
+        run: |
+          echo "Calcolo non riuscito: i dati pubblicati restano quelli del giro precedente (registro cifrato in log.enc)."
+          exit 1
