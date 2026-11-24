@@ -1,8 +1,10 @@
 /* REFLOW ORBIT — strato cloud (sola lettura).
    Login Microsoft (MSAL, registrazione condivisa "REFLOW ONE" con PLANNER e iMAPS)
-   e lettura via Microsoft Graph dei file prodotti dallo script di monitoraggio:
-     <BASE>/dati/orbit.json      stato, serie e sfalci di tutti gli impianti
-     <BASE>/dati/img/<id>.png    immagine satellitare recente di ogni impianto */
+   e lettura dei dati prodotti dallo script di monitoraggio:
+     - ramo `dati` di questo repository (aggiornamento settimanale automatico,
+       GitHub Actions): orbit.enc e img/<codice>.enc, cifrati; chiave in
+       <BASE>/chiave_dati.txt su SharePoint, letta via Microsoft Graph;
+     - ripiego: <BASE>/dati/orbit.json e <BASE>/dati/img/<id>.png su SharePoint. */
 (function () {
   'use strict';
   const CLIENT_ID = 'ef16e670-e362-4954-a912-b628afde91a0';
@@ -45,15 +47,64 @@
   }
   const item = rel => `/sites/${siteId}/drive/root:/${encodeURI(BASE + '/' + rel).replace(/#/g, '%23')}:`;
 
-  O.getJSON = async rel => {
+  /* Dati dell'aggiornamento settimanale automatico (GitHub Actions): ramo `dati`
+     di questo repository, solo cifrati (AES-256-GCM). La chiave sta in
+     <BASE>/chiave_dati.txt su SharePoint: la legge solo chi entra con l'account
+     aziendale e ha accesso alla cartella. Formato file: "ORB1" + nonce (12 byte)
+     + testo cifrato con tag; dati aggiuntivi autenticati = nome del file. */
+  const DATI_URL = 'https://raw.githubusercontent.com/reflowservice/reflow-orbit/dati/';
+  let chiave = null;
+  async function key() {
+    if (chiave) return chiave;
+    await site();
+    const r = await graph(item('chiave_dati.txt') + '/content', { cache: 'no-store' });
+    if (!r.ok) return null;
+    const raw = Uint8Array.from(atob((await r.text()).trim()), c => c.charCodeAt(0));
+    return chiave = await crypto.subtle.importKey('raw', raw, 'AES-GCM', false, ['decrypt']);
+  }
+  async function cifrato(nome, versione) {
+    const k = await key();
+    if (!k) throw new Error('chiave dei dati non disponibile');
+    const r = await fetch(DATI_URL + nome + '?v=' + encodeURIComponent(versione), { cache: 'no-store' });
+    if (!r.ok) throw new Error(`${nome}: ${r.status}`);
+    const b = new Uint8Array(await r.arrayBuffer());
+    if (String.fromCharCode(...b.subarray(0, 4)) !== 'ORB1') throw new Error(`${nome}: formato non riconosciuto`);
+    return crypto.subtle.decrypt({ name: 'AES-GCM', iv: b.subarray(4, 16), additionalData: new TextEncoder().encode(nome) }, k, b.subarray(16));
+  }
+  O.fonte = null;     // 'automatico' (ramo dati) o 'sharepoint' (dati/orbit.json, aggiornamento manuale)
+  O.versione = '';
+
+  async function daSharePoint(rel) {
     await site();
     const r = await graph(item(rel) + '/content', { cache: 'no-store' });
     if (r.status === 404) return null;
     if (!r.ok) throw new Error(`Lettura di ${rel} non riuscita (${r.status})`);
     return r.json();
+  }
+  O.getJSON = async rel => {
+    if (rel === 'dati/orbit.json') {
+      try {
+        const d = JSON.parse(new TextDecoder().decode(await cifrato('orbit.enc', Date.now())));
+        O.fonte = 'automatico';
+        O.versione = d.aggiornato || '';
+        return d;
+      } catch (e) {
+        // Ripiego: ultima copia su SharePoint (calcolo manuale), se i dati automatici non si leggono.
+        console.warn('ORBIT: dati automatici non letti, uso SharePoint', e);
+        O.fonte = 'sharepoint';
+        return daSharePoint(rel);
+      }
+    }
+    return daSharePoint(rel);
   };
   const IMG = {};
   O.imgURL = rel => IMG[rel] = IMG[rel] || (async () => {
+    if (rel.endsWith('.enc')) {
+      try {
+        const nome = rel.replace(/^dati\//, '');
+        return URL.createObjectURL(new Blob([await cifrato(nome, O.versione)], { type: 'image/png' }));
+      } catch (e) { console.warn('ORBIT: immagine non letta', e); return null; }
+    }
     await site();
     const r = await graph(item(rel) + '/content');
     if (!r.ok) return null;
