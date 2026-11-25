@@ -484,7 +484,7 @@ function card(i){
       ${i.immagine_bbox?`<svg viewBox="0 0 512 512" preserveAspectRatio="xMidYMid slice">${contorno(i.geometria,i.immagine_bbox,512,512,2.4)}</svg>`:''}
       <span class="chip${e.off?' off':''}" style="--c:${s.c}"><i></i>${esc(s.t)}${e.off?' <small>al 31 ott</small>':''}</span>
       ${haDi(i)?`<span class="ha">${num(haDi(i),1)} ha</span>`:''}</div>
-    <div class="cb"><div class="cn">${esc(i.nome)}</div><div class="cm">${esc(titolo(i.regione))}${i.pm?', PM '+esc(titolo(i.pm)):''}${i.sfalcio==='su richiesta'?'<span class="tag" title="Sfalcio non a contratto: si fa su richiesta del cliente">Su richiesta</span>':''}</div>
+    <div class="cb"><div class="cn">${esc(i.nome)}</div><div class="cm">${esc(titolo(i.regione))}${i.pm?', PM '+esc(titolo(i.pm)):''}${i.sfalcio==='su richiesta'?'<span class="tag" title="Sfalcio non a contratto: si fa su richiesta del cliente">Su richiesta</span>':i.sfalcio==='in attivazione'?'<span class="tag" title="Contratto O&M o sfalcio non ancora attivo: avviso solo informativo">In attivazione</span>':''}</div>
       ${e.k==='nd'?'':`<div class="cf"><div class="metric"><b>${num(e.off&&e.st.ndvi_stagione!=null?e.st.ndvi_stagione:i.stato?.ndvi)}</b><span>${e.off?'verde al 31 ott':'indice di verde'}</span></div>${spark(i.serie,e)}</div>`}
       ${gnote}</div></button>`;
 }
@@ -565,7 +565,7 @@ async function scheda(id){
   const gm=i.centro?`https://www.google.com/maps/@${i.centro[0]},${i.centro[1]},600m/data=!3m1!1e3`:null;
   const ico='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h4v4M13 3L7.5 8.5M12 9.5V13H3V4h3.5"/></svg>';
   const days=st.giorni_alla_soglia;
-  $('sheet').innerHTML=`<div class="sh-top"><div><h2 id="sh-name">${esc(i.nome)}</h2><div class="sub">${esc(titolo(i.cliente))}, ${esc(titolo(i.regione))}. PM ${esc(titolo(i.pm||'–'))}${i.pm2?', seconda linea '+esc(titolo(i.pm2)):''}${i.sfalcio==='su richiesta'?'<span class="tag">Sfalcio su richiesta</span>':''}</div></div><button class="x" id="b-x" aria-label="Chiudi">×</button></div>
+  $('sheet').innerHTML=`<div class="sh-top"><div><h2 id="sh-name">${esc(i.nome)}</h2><div class="sub">${esc(titolo(i.cliente))}, ${esc(titolo(i.regione))}. PM ${esc(titolo(i.pm||'–'))}${i.pm2?', seconda linea '+esc(titolo(i.pm2)):''}${i.sfalcio==='su richiesta'?'<span class="tag">Sfalcio su richiesta</span>':i.sfalcio==='in attivazione'?'<span class="tag">In attivazione: avviso solo informativo</span>':''}</div></div><button class="x" id="b-x" aria-label="Chiudi">×</button></div>
   <div class="sh-body">
     <div class="row2">
       <div class="panel">
