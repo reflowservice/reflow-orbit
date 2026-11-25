@@ -1,0 +1,1 @@
+Ramo dati di REFLOW ORBIT: solo file cifrati (AES-256-GCM), scritti dal workflow di aggiornamento settimanale. Non modificare a mano.
