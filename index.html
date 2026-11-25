@@ -11,7 +11,7 @@
 <meta name="theme-color" content="#120531">
 <script>try{if(sessionStorage.getItem('orbit_refresh')==='1')document.documentElement.classList.add('refreshing')}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Syncopate:wght@400;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Syncopate:wght@400;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --night:#0d0423; --night-2:#150837; --navy:#18063c; --deep:#1f0e4d;
@@ -19,7 +19,8 @@
   --paper:#ffffff; --mist:#f3f2f8; --mist-2:#eceaf4; --ink:#1b1636; --muted:#6c6886; --hair:#e4e1ee;
   --s-rosso:#e5484d; --s-giallo:#f0a12f; --s-verde:#34b27b; --s-grigio:#8e8aa8; --s-spento:#6f7aa3; --s-nd:#b9b5cc;
   --font:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
-  --disp:"Jost","Instrument Sans",sans-serif;
+  --disp:"Instrument Serif",Georgia,serif;
+  --sp:"Jost","Instrument Sans",sans-serif;
   --brand:"Syncopate","Inter",sans-serif;
   --r-l:20px; --r-m:14px; --r-s:10px;
   --ease:cubic-bezier(.2,.7,.2,1);
@@ -64,13 +65,13 @@ header{position:relative;z-index:20;display:flex;align-items:center;gap:16px;hei
 .sp-scan{position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent,rgba(95,211,255,.9),transparent);box-shadow:0 0 18px rgba(23,179,232,.7);opacity:0;animation:scan 2.4s 1.1s ease-in-out forwards}
 @keyframes scan{0%{opacity:0;top:0}10%{opacity:1}90%{opacity:1}100%{opacity:0;top:100%}}
 @keyframes fi{to{opacity:1}}
-.sp-hud{position:absolute;font:400 11.5px/1.3 var(--disp);letter-spacing:.08em;color:rgba(233,248,255,.86);white-space:nowrap;opacity:0;animation:fi .8s 1.6s forwards;text-shadow:0 1px 6px rgba(0,0,0,.6)}
+.sp-hud{position:absolute;font:400 11.5px/1.3 var(--sp);letter-spacing:.08em;color:rgba(233,248,255,.86);white-space:nowrap;opacity:0;animation:fi .8s 1.6s forwards;text-shadow:0 1px 6px rgba(0,0,0,.6)}
 .sp-hud.t{left:0;top:-24px}.sp-hud.b{right:0;bottom:-24px}
 .sp-hud em{font-style:normal;color:var(--cyan)}
 .sp-in{position:relative;z-index:2;align-self:center;max-width:760px}
 .sp-title{margin:0;font:400 clamp(30px,4.4vw,68px)/1 var(--brand);letter-spacing:.11em;text-transform:uppercase;white-space:nowrap}
 .sp-title span{color:var(--cyan)}
-.sp-in p{margin:24px 0 44px;max-width:34ch;font:300 clamp(18px,1.7vw,24px)/1.4 var(--disp);letter-spacing:.02em;color:#d9d3f3}
+.sp-in p{margin:24px 0 44px;max-width:34ch;font:300 clamp(18px,1.7vw,24px)/1.4 var(--sp);letter-spacing:.02em;color:#d9d3f3}
 .sp-go{display:inline-flex;align-items:center;gap:14px;height:54px;padding:0 30px 0 32px;font:700 13px var(--brand);letter-spacing:.24em;text-transform:uppercase;color:var(--navy);background:#fff;border:0;border-radius:999px;cursor:pointer;box-shadow:0 14px 40px rgba(0,0,0,.4);transition:transform .2s var(--ease),box-shadow .2s}
 .sp-go:hover{transform:translateY(-2px);box-shadow:0 18px 46px rgba(0,0,0,.5)}
 .sp-go svg{width:18px;height:18px}
@@ -82,7 +83,7 @@ header{position:relative;z-index:20;display:flex;align-items:center;gap:16px;hei
 .refreshing #gate{display:grid}
 .refreshing #splash{display:none}
 #gate.out{opacity:0;visibility:hidden}
-.gate-msg{margin:22px 0 0;min-height:1.5em;font:300 clamp(16px,1.5vw,20px)/1.4 var(--disp);letter-spacing:.02em;color:#d9d3f3}
+.gate-msg{margin:22px 0 0;min-height:1.5em;font:300 clamp(16px,1.5vw,20px)/1.4 var(--sp);letter-spacing:.02em;color:#d9d3f3}
 .gate-msg.err{color:#ffb4b4}
 .gate-pulse{display:block;width:min(100%,460px);height:auto;margin-top:26px;overflow:visible}
 .gate-pulse .orb{fill:none;stroke:rgba(169,159,214,.22);stroke-width:1;stroke-dasharray:2 6}
@@ -251,7 +252,7 @@ header{position:relative;z-index:20;display:flex;align-items:center;gap:16px;hei
 .st b small{font-size:12px;font-weight:500;color:var(--muted)}
 .chart{position:relative}
 .chart svg{width:100%;height:auto;display:block;overflow:visible}
-.chart .ax{font:400 11.5px var(--disp);fill:var(--muted)}
+.chart .ax{font:400 11.5px var(--font);fill:var(--muted)}
 .chart-tip{position:absolute;pointer-events:none;padding:7px 10px;border-radius:9px;background:var(--navy);color:#fff;font-size:12px;white-space:nowrap;transform:translate(-50%,-120%);opacity:0;transition:opacity .1s}
 .chart-tip.on{opacity:1}
 .leg{display:flex;flex-wrap:wrap;gap:18px;margin-top:12px;font-size:12.5px;color:var(--muted)}
